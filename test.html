@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hex Grid with Spritesheet</title>
+  <style>
+    body {
+      background: #2b2b2b;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+      background: #111;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="hexCanvas" width="775" height="910"></canvas>
+
+  <script>
+    // --- CONFIGURATION ---
+    const TILE_WIDTH = 100;   // width of each hex tile in pixels
+    const TILE_HEIGHT = 87;  // height of each hex tile in pixels
+    const COLUMNS = 10;      // number of hex columns to render
+    const ROWS = 10;         // number of hex rows to render
+
+    const SPRITESHEET_SRC = 'hex_spritesheet.png'; // path to your spritesheet
+    const SPRITESHEET_COLUMNS = 8; // how many tiles per row in the spritesheet
+
+    // This is an example mapping of terrain types to tile index
+    const map = [
+      [0, 1, 2, 3, 0, 1, 2, 3, 0, 1],
+      [1, 2, 3, 0, 1, 2, 3, 0, 1, 2],
+      [2, 3, 0, 1, 2, 3, 0, 7, 2, 3],
+      [3, 0, 1, 2, 3, 0, 1, 2, 3, 0],
+      [0, 1, 2, 4, 0, 1, 2, 3, 0, 1],
+      [1, 2, 3, 0, 1, 2, 3, 6, 1, 2],
+      [2, 3, 0, 1, 2, 3, 0, 1, 2, 3],
+      [3, 0, 1, 2, 3, 5, 1, 2, 3, 0],
+      [0, 1, 2, 7, 0, 1, 2, 3, 0, 1],
+      [1, 2, 3, 0, 1, 2, 3, 0, 1, 2],
+    ];
+
+    const canvas = document.getElementById('hexCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const spritesheet = new Image();
+    spritesheet.src = SPRITESHEET_SRC;
+    spritesheet.onload = () => {
+      drawHexMap();
+    };
+
+    function drawHexMap() {
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLUMNS; col++) {
+          const terrainIndex = map[row][col];
+
+          // --- Calculate source crop ---
+          const sx = (terrainIndex % SPRITESHEET_COLUMNS) * TILE_WIDTH;
+          const sy = Math.floor(terrainIndex / SPRITESHEET_COLUMNS) * TILE_HEIGHT;
+
+          // --- Calculate destination position on flat-top hex grid ---
+          const dx = TILE_WIDTH * 0.75 * col;
+          const dy = TILE_HEIGHT * row + (col % 2) * (TILE_HEIGHT / 2);
+
+          ctx.drawImage(
+            spritesheet, sx, sy, TILE_WIDTH, TILE_HEIGHT,
+            dx, dy, TILE_WIDTH, TILE_HEIGHT
+          );
+        }
+      }
+    }
+  </script>
+</body>
+</html>
